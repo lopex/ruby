@@ -9406,6 +9406,49 @@ rb_to_symbol(VALUE name)
     return rb_str_intern(name);
 }
 
+static VALUE
+rb_str_coderange_m(VALUE str) {
+    const char*cr = 0;
+    switch (ENC_CODERANGE(str)) {
+    case ENC_CODERANGE_7BIT:
+        cr = "7BIT";
+        break;
+    case ENC_CODERANGE_BROKEN:
+        cr = "BROKEN";
+        break;
+    case ENC_CODERANGE_UNKNOWN:
+        cr = "UNKNOWN";
+        break;
+    case ENC_CODERANGE_VALID:
+        cr = "VALID";
+        break;
+    default:
+        rb_raise(rb_eRuntimeError, "bad coderange");
+    }
+    return rb_str_new(cr, strlen(cr));
+}
+
+static VALUE
+rb_str_coderange_set_m(VALUE str, VALUE cr) {
+    // VALUE cr_s = rb_string_value(&cr);
+    const char*ptr = RSTRING_PTR(cr);
+    int cr_i = 0;
+    if (strcmp(ptr, "7BIT") == 0) {
+        cr_i = ENC_CODERANGE_7BIT;
+    } else if (strcmp(ptr, "BROKEN") == 0) {
+        cr_i = ENC_CODERANGE_BROKEN;
+    } else if (strcmp(ptr, "UNKNOWN") == 0) {
+        cr_i = ENC_CODERANGE_UNKNOWN;
+    } else if (strcmp(ptr, "VALID") == 0) {
+        cr_i = ENC_CODERANGE_VALID;
+    } else {
+        rb_raise(rb_eRuntimeError, "bad coderange");
+    }
+    ENC_CODERANGE_SET(str, cr_i);
+    return str;
+}
+
+
 /*
  *  A <code>String</code> object holds and manipulates an arbitrary sequence of
  *  bytes, typically representing characters. String objects may be created
@@ -9562,6 +9605,10 @@ Init_String(void)
     rb_define_method(rb_cString, "b", rb_str_b, 0);
     rb_define_method(rb_cString, "valid_encoding?", rb_str_valid_encoding_p, 0);
     rb_define_method(rb_cString, "ascii_only?", rb_str_is_ascii_only_p, 0);
+
+    rb_define_method(rb_cString, "code_range", rb_str_coderange_m, 0);
+    rb_define_method(rb_cString, "code_range", rb_str_coderange_set_m, 1);
+
 
     rb_fs = Qnil;
     rb_define_variable("$;", &rb_fs);
