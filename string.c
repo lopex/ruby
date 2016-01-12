@@ -9607,7 +9607,7 @@ Init_String(void)
     rb_define_method(rb_cString, "ascii_only?", rb_str_is_ascii_only_p, 0);
 
     rb_define_method(rb_cString, "code_range", rb_str_coderange_m, 0);
-    rb_define_method(rb_cString, "code_range", rb_str_coderange_set_m, 1);
+    rb_define_method(rb_cString, "code_range=", rb_str_coderange_set_m, 1);
 
 
     rb_fs = Qnil;
